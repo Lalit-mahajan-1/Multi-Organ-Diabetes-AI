@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TongueRouteImport } from './routes/tongue'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResultsRouteImport } from './routes/results'
 import { Route as ProcessingRouteImport } from './routes/processing'
@@ -16,7 +17,13 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AssessmentRouteImport } from './routes/assessment'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OrgansOrganIdRouteImport } from './routes/organs.$organId'
 
+const TongueRoute = TongueRouteImport.update({
+  id: '/tongue',
+  path: '/tongue',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -52,6 +59,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrgansOrganIdRoute = OrgansOrganIdRouteImport.update({
+  id: '/organs/$organId',
+  path: '/organs/$organId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +73,8 @@ export interface FileRoutesByFullPath {
   '/processing': typeof ProcessingRoute
   '/results': typeof ResultsRoute
   '/signup': typeof SignupRoute
+  '/tongue': typeof TongueRoute
+  '/organs/$organId': typeof OrgansOrganIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +84,8 @@ export interface FileRoutesByTo {
   '/processing': typeof ProcessingRoute
   '/results': typeof ResultsRoute
   '/signup': typeof SignupRoute
+  '/tongue': typeof TongueRoute
+  '/organs/$organId': typeof OrgansOrganIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +96,8 @@ export interface FileRoutesById {
   '/processing': typeof ProcessingRoute
   '/results': typeof ResultsRoute
   '/signup': typeof SignupRoute
+  '/tongue': typeof TongueRoute
+  '/organs/$organId': typeof OrgansOrganIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +109,8 @@ export interface FileRouteTypes {
     | '/processing'
     | '/results'
     | '/signup'
+    | '/tongue'
+    | '/organs/$organId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +120,8 @@ export interface FileRouteTypes {
     | '/processing'
     | '/results'
     | '/signup'
+    | '/tongue'
+    | '/organs/$organId'
   id:
     | '__root__'
     | '/'
@@ -109,6 +131,8 @@ export interface FileRouteTypes {
     | '/processing'
     | '/results'
     | '/signup'
+    | '/tongue'
+    | '/organs/$organId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,10 +143,19 @@ export interface RootRouteChildren {
   ProcessingRoute: typeof ProcessingRoute
   ResultsRoute: typeof ResultsRoute
   SignupRoute: typeof SignupRoute
+  TongueRoute: typeof TongueRoute
+  OrgansOrganIdRoute: typeof OrgansOrganIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tongue': {
+      id: '/tongue'
+      path: '/tongue'
+      fullPath: '/tongue'
+      preLoaderRoute: typeof TongueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -172,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/organs/$organId': {
+      id: '/organs/$organId'
+      path: '/organs/$organId'
+      fullPath: '/organs/$organId'
+      preLoaderRoute: typeof OrgansOrganIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +223,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProcessingRoute: ProcessingRoute,
   ResultsRoute: ResultsRoute,
   SignupRoute: SignupRoute,
+  TongueRoute: TongueRoute,
+  OrgansOrganIdRoute: OrgansOrganIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

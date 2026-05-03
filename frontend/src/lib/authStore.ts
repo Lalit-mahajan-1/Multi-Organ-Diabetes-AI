@@ -9,7 +9,6 @@ import {
   apiDemoLogin,
   apiGetMe,
   apiLogout as apiLogoutFn,
-  getToken,
   type AuthUser,
 } from "./api";
 
@@ -47,10 +46,19 @@ function write<T>(key: string, value: T) {
 
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
+const clearSession = () => {
+  if (!isBrowser) return;
+  window.localStorage.removeItem(SESSION_KEY);
+  emit();
+};
 
 export const auth = {
   current(): AuthUser | null {
     return read<AuthUser | null>(SESSION_KEY, null);
+  },
+
+  clear() {
+    clearSession();
   },
 
   async signup(input: { email: string; password: string; name: string; role: UserRole }): Promise<AuthUser> {
@@ -97,11 +105,10 @@ export const auth = {
     }
   },
 
-  logout() {
+  async logout() {
     if (!isBrowser) return;
-    apiLogoutFn();
-    window.localStorage.removeItem(SESSION_KEY);
-    emit();
+    await apiLogoutFn().catch(() => {});
+    clearSession();
   },
 
   subscribe(fn: () => void) {
@@ -111,14 +118,15 @@ export const auth = {
 
   /** Check if we have a valid token and refresh user from backend. */
   async refresh(): Promise<AuthUser | null> {
-    if (!getToken()) return null;
     try {
       const user = await apiGetMe();
       if (user) {
         write(SESSION_KEY, user);
         emit();
+        return user;
       }
-      return user;
+      clearSession();
+      return null;
     } catch {
       return this.current();
     }

@@ -1,0 +1,216 @@
+{
+  "retina": {
+    "accuracy": 0.92,
+    "model": "EfficientNet-B4 + CBAM + Focal + Ordinal Loss",
+    "current_state": {
+      "severity_grade": 3,
+      "severity_label": "Severe Non-Proliferative Diabetic Retinopathy",
+      "percentage_damage": 68,
+      "confidence": 0.87,
+      "uncertainty": {
+        "score": 0.04,
+        "level": "LOW",
+        "reliable": true
+      }
+    },
+    "clinical_findings": {
+      "microaneurysms": "moderate",
+      "hemorrhages": "moderate",
+      "hard_exudates": "moderate",
+      "soft_exudates": "mild",
+      "macular_edema": "mild",
+      "neovascularization": "absent"
+    },
+    "6_month_projection": {
+      "next_stage": "Possible transition to Proliferative DR",
+      "progression_probability": 0.35,
+      "vision_loss_risk": "moderate-high",
+      "damage_zones": [
+        "retinal capillaries",
+        "macula",
+        "optic nerve head"
+      ],
+      "expected_symptoms": [
+        "blurred vision",
+        "floating dark spots",
+        "distorted vision",
+        "difficulty reading",
+        "night vision issues"
+      ],
+      "possible_diseases": [
+        "Proliferative Diabetic Retinopathy",
+        "Diabetic Macular Edema",
+        "Retinal Hemorrhage"
+      ]
+    },
+    "organ_impact": {
+      "eyes": {
+        "risk": "VERY HIGH",
+        "damage": "microvascular leakage and retinal ischemia"
+      },
+      "kidneys": {
+        "risk": "HIGH",
+        "damage": "glomerular microvascular damage"
+      },
+      "heart": {
+        "risk": "MODERATE-HIGH",
+        "damage": "microvascular dysfunction"
+      },
+      "nerves": {
+        "risk": "MODERATE",
+        "damage": "peripheral neuropathy initiation"
+      }
+    }
+  },
+
+  "tongue": {
+    "accuracy": 0.94,
+    "model": "ResNet50 + Multimodal Fusion + CLAHE + Grad-CAM",
+    "current_state": {
+      "severity_stage": 3,
+      "severity_label": "Moderate-Severe Diabetic Indicators",
+      "percentage_damage": 72,
+      "confidence": 0.79,
+      "uncertainty": {
+        "confidence_interval": [0.71, 0.87],
+        "reliable": true
+      }
+    },
+    "feature_analysis": {
+      "color": {
+        "observed": "deep red / purple",
+        "meaning": "poor circulation, blood stasis"
+      },
+      "coating": {
+        "observed": "thick yellow",
+        "meaning": "metabolic imbalance, gut stress"
+      },
+      "texture": {
+        "observed": "cracked",
+        "meaning": "fluid deficiency, dehydration"
+      },
+      "moisture": {
+        "observed": "dry",
+        "meaning": "poor glucose regulation"
+      },
+      "shape": {
+        "observed": "swollen",
+        "meaning": "systemic metabolic stress"
+      }
+    },
+    "6_month_projection": {
+      "next_stage": "Severe metabolic imbalance",
+      "progression_probability": 0.42,
+      "systemic_worsening_risk": "HIGH",
+      "damage_zones": [
+        "oral mucosa",
+        "digestive tract",
+        "peripheral nerves",
+        "blood circulation system"
+      ],
+      "expected_symptoms": [
+        "dry mouth",
+        "burning tongue",
+        "bad breath",
+        "frequent infections",
+        "slow healing wounds",
+        "fatigue"
+      ],
+      "possible_diseases": [
+        "Diabetic Neuropathy",
+        "Gastroparesis",
+        "Oral Candidiasis",
+        "Periodontal Disease"
+      ]
+    },
+    "organ_impact": {
+      "pancreas": {
+        "risk": "VERY HIGH",
+        "damage": "beta-cell decline"
+      },
+      "kidneys": {
+        "risk": "HIGH",
+        "damage": "early nephropathy signals"
+      },
+      "heart": {
+        "risk": "HIGH",
+        "damage": "circulatory inefficiency"
+      },
+      "digestive_system": {
+        "risk": "MODERATE-HIGH",
+        "damage": "delayed gastric emptying"
+      },
+      "oral_cavity": {
+        "risk": "VERY HIGH",
+        "damage": "infection and inflammation"
+      },
+      "nerves": {
+        "risk": "MODERATE-HIGH",
+        "damage": "autonomic dysfunction"
+      }
+    }
+  },
+
+  "combined_analysis": {
+    "overall_score": 7.8,
+    "scale": "0-10",
+    "severity_label": "Severe Risk",
+    "model_agreement": true,
+    "agreement_strength": "STRONG",
+    "confidence": 0.84,
+    "6_month_global_projection": {
+      "overall_condition": "High probability of progression to advanced diabetic complications",
+      "critical_organs": [
+        {
+          "organ": "Eyes",
+          "risk": "VERY HIGH",
+          "reason": "advanced retinal damage already present"
+        },
+        {
+          "organ": "Kidneys",
+          "risk": "VERY HIGH",
+          "reason": "both models indicate microvascular stress"
+        },
+        {
+          "organ": "Heart",
+          "risk": "HIGH",
+          "reason": "circulation + vascular signals"
+        },
+        {
+          "organ": "Nerves",
+          "risk": "HIGH",
+          "reason": "shared neuropathy indicators"
+        },
+        {
+          "organ": "Oral System",
+          "risk": "VERY HIGH",
+          "reason": "direct tongue abnormalities"
+        }
+      ],
+      "timeline": {
+        "3_months": "retinal stress increases, oral symptoms visible",
+        "6_months": "risk of kidney decline and neuropathy onset",
+        "1_year": "cardiovascular risk significantly elevated",
+        "3_years": "multi-organ complication risk high"
+      }
+    },
+    "predicted_future_diseases": [
+      "Proliferative Diabetic Retinopathy",
+      "Diabetic Nephropathy",
+      "Diabetic Neuropathy",
+      "Cardiovascular Disease",
+      "Diabetic Gastroparesis",
+      "Oral Infections"
+    ],
+    "clinical_priority": {
+      "level": "URGENT",
+      "reason": "multi-organ risk signals detected",
+      "flag": "Immediate medical evaluation recommended"
+    }
+  },
+
+  "meta": {
+    "note": "AI-generated prediction structure for project use. Not a medical diagnosis.",
+    "version": "2.0"
+  }
+}

@@ -2,18 +2,11 @@
  * API client for the backend.
  */
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
-const TOKEN_KEY = "moai.token";
-
-export function getToken(): string | null { return localStorage.getItem(TOKEN_KEY); }
-export function setToken(t: string) { localStorage.setItem(TOKEN_KEY, t); }
-export function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
 
 async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-  const token = getToken();
   const headers = new Headers(init?.headers);
-  if (token) headers.set("Authorization", `Bearer ${token}`);
-  return fetch(`${API}${path}`, { ...init, headers });
+  return fetch(`${API_BASE_URL}${path}`, { ...init, headers, credentials: "include" });
 }
 
 async function apiJSON<T = unknown>(path: string, init?: RequestInit): Promise<T> {
@@ -34,32 +27,90 @@ export interface AuthUser {
 interface TokenRes { access_token: string; token_type: string; user: AuthUser; }
 
 export async function apiSignup(body: { email: string; password: string; name: string; role: string }): Promise<AuthUser> {
-  const d = await apiJSON<TokenRes>("/api/auth/signup", {
+  const { user } = await apiJSON<TokenRes>("/api/auth/signup", {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
-  setToken(d.access_token);
-  return d.user;
+  return user;
 }
 
 export async function apiLogin(email: string, password: string): Promise<AuthUser> {
-  const d = await apiJSON<TokenRes>("/api/auth/login", {
+  const { user } = await apiJSON<TokenRes>("/api/auth/login", {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }),
   });
-  setToken(d.access_token);
-  return d.user;
+  return user;
 }
 
 export async function apiDemoLogin(): Promise<AuthUser> {
-  const d = await apiJSON<TokenRes>("/api/auth/demo", { method: "POST" });
-  setToken(d.access_token);
-  return d.user;
+  const { user } = await apiJSON<TokenRes>("/api/auth/demo", { method: "POST" });
+  return user;
 }
 
 export async function apiGetMe(): Promise<AuthUser | null> {
   try { return await apiJSON<AuthUser>("/api/auth/me"); } catch { return null; }
 }
 
-export function apiLogout() { clearToken(); }
+export async function apiLogout() { await apiFetch("/api/auth/logout", { method: "POST" }); }
+
+// ── Tongue Analysis ────────────────────────────────────────
+export interface TongueAnalysisResponse {
+  model_name: string;
+  model_description: string;
+  classes?: string[];
+  prediction: "Diabetic" | "Non-Diabetic";
+  prediction_details: {
+    label: "diabetic" | "non_diabetic";
+    confidence: number;
+    confidence_category?: "Low confidence" | "Medium confidence" | "High confidence";
+    raw_model_probability_for_class_index_1?: number;
+    estimated_diabetic_risk_percent?: number;
+    probabilities: {
+      diabetic: number;
+      non_diabetic: number;
+    };
+  };
+  probability: number;
+  confidence: number;
+  confidence_category?: "Low confidence" | "Medium confidence" | "High confidence";
+  raw_model_probability_for_class_index_1?: number;
+  estimated_diabetic_risk_percent?: number;
+  risk_score: number;
+  risk_level: "LOW" | "MODERATE" | "HIGH" | "VERY HIGH";
+  severity_stage: number;
+  severity_label: string;
+  hsv_features: { hue: number; saturation: number; value: number };
+  explainability: {
+    most_affected_region: string;
+    zone_activation_scores: Record<string, number>;
+  };
+  visual_features?: Record<string, { observed: string; meaning: string }>;
+  findings: string[];
+  feature_analysis: Record<string, { observed: string; meaning: string }>;
+  current_state: Record<string, unknown>;
+  projection: Record<string, unknown>;
+  organ_impact: Record<string, { risk: string; damage: string }>;
+  images: {
+    original: string;
+    normalized: string;
+    heatmap: string;
+    overlay: string;
+  };
+  analysis_id?: string;
+  stored?: boolean;
+}
+
+export async function apiAnalyzeTongue(file: File): Promise<TongueAnalysisResponse> {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await apiFetch("/api/tongue/analyze", {
+    method: "POST",
+    body: form,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(body.detail || `Tongue analysis failed`);
+  }
+  return res.json() as Promise<TongueAnalysisResponse>;
+}
 
 // ── Upload ──────────────────────────────────────────────────
 export interface UploadResponse {
@@ -97,11 +148,11 @@ export function apiAnalyze(
   const ctrl = new AbortController();
   (async () => {
     try {
-      const token = getToken();
-      const res = await fetch(`${API}/api/analyze`, {
+      const res = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId }),
+        credentials: "include",
         signal: ctrl.signal,
       });
       if (!res.ok) throw new Error(`Analyze failed: ${res.status}`);
