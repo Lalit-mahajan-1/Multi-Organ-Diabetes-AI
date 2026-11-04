@@ -26,7 +26,7 @@ import {
 import { AppHeader, MedicalDisclaimer } from "@/components/AppHeader";
 import { RiskGauge } from "@/components/RiskGauge";
 import { OrganCard } from "@/components/OrganCard";
-import { mockResults, recommendations as mockRecommendations, riskMeta, type OrganResult } from "@/lib/mockData";
+import { riskMeta, type OrganResult } from "@/lib/riskMeta";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { history } from "@/lib/authStore";
 import { assessmentStore } from "@/lib/assessmentStore";
@@ -54,16 +54,14 @@ function ResultsPage() {
 
   useEffect(() => {
     if (!sessionId) {
-      // No session — use mock data
-      setResults(mockResults);
-      setRecommendations(mockRecommendations);
+      setError("No assessment results are available yet.");
       setLoading(false);
       return;
     }
 
     (async () => {
       try {
-        const data = await apiGetResults(sessionId) as any;
+        const data = (await apiGetResults(sessionId)) as any;
         setResults({
           overallRisk: data.overallRisk || data.overall_risk || "moderate",
           overallScore: data.overallScore || data.overall_score || 50,
@@ -73,12 +71,10 @@ function ResultsPage() {
             hasImage: o.hasImage ?? o.has_image ?? false,
           })),
         });
-        setRecommendations(data.recommendations || mockRecommendations);
+        setRecommendations(data.recommendations || {});
       } catch (err) {
         console.error("Failed to load results:", err);
-        setError("Failed to load results. Showing demo data.");
-        setResults(mockResults);
-        setRecommendations(mockRecommendations);
+        setError("Assessment results could not be loaded.");
       } finally {
         setLoading(false);
       }
@@ -92,7 +88,10 @@ function ResultsPage() {
     const patient = assessmentStore.get().patient;
     history.add({
       userId: user.id,
-      patientName: user.role === "clinician" ? `Patient · age ${patient.age || "—"}` : user.name,
+      patientName:
+        user.role === "clinician"
+          ? `Patient · age ${patient.age || "—"}`
+          : user.name,
       overallRisk: results.overallRisk,
       overallScore: results.overallScore,
       organCount: results.organs.length,
@@ -108,8 +107,34 @@ function ResultsPage() {
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-            <p className="mt-4 text-sm text-muted-foreground">Loading results…</p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Loading results…
+            </p>
           </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!results) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppHeader />
+        <main className="mx-auto max-w-3xl px-6 py-16">
+          <section className="clinical-card-elevated p-8 text-center">
+            <h1 className="text-2xl font-semibold text-foreground">
+              No results available
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Complete an assessment to view model-generated findings here.
+            </p>
+            <Link
+              to="/assessment"
+              className="btn-premium mt-6 inline-flex rounded-xl px-5 py-3 text-sm font-semibold"
+            >
+              Start assessment
+            </Link>
+          </section>
         </main>
       </div>
     );
@@ -117,7 +142,7 @@ function ResultsPage() {
 
   const { overallRisk, overallScore, organs } = results;
   const meta = riskMeta[overallRisk as RiskLevel];
-  const recs = recommendations;
+  const recs = recommendations || {};
 
   async function handleExport() {
     if (!sessionId) {
@@ -146,9 +171,18 @@ function ResultsPage() {
             <ArrowLeft className="h-4 w-4" /> Back to dashboard
           </Link>
           <div className="flex items-center gap-2">
-            <ActionBtn icon={Printer} label="Print" onClick={() => window.print()} />
+            <ActionBtn
+              icon={Printer}
+              label="Print"
+              onClick={() => window.print()}
+            />
             <ActionBtn icon={Share2} label="Share with doctor" />
-            <ActionBtn icon={Download} label="Download PDF" primary onClick={handleExport} />
+            <ActionBtn
+              icon={Download}
+              label="Download PDF"
+              primary
+              onClick={handleExport}
+            />
           </div>
         </div>
 
@@ -178,20 +212,41 @@ function ResultsPage() {
                 <span className={meta.text}>{meta.label.toLowerCase()}</span>
               </h1>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-2xl">
-                Combined analysis across {organs.length} organ systems and clinical inputs. The score reflects
-                relative risk based on uploaded data; clinical correlation is required.
+                Combined analysis across {organs.length} organ systems and
+                clinical inputs. The score reflects relative risk based on
+                uploaded data; clinical correlation is required.
               </p>
 
               <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
                   { label: "Organ systems", value: organs.length.toString() },
-                  { label: "Avg confidence", value: `${Math.round(organs.reduce((a: number, o: any) => a + o.confidence, 0) / organs.length)}%` },
-                  { label: "Critical findings", value: organs.filter((o: any) => o.risk === "high" || o.risk === "severe").length.toString() },
-                  { label: "Generated", value: new Date().toLocaleDateString() },
+                  {
+                    label: "Avg confidence",
+                    value: `${Math.round(organs.reduce((a: number, o: any) => a + o.confidence, 0) / organs.length)}%`,
+                  },
+                  {
+                    label: "Critical findings",
+                    value: organs
+                      .filter(
+                        (o: any) => o.risk === "high" || o.risk === "severe",
+                      )
+                      .length.toString(),
+                  },
+                  {
+                    label: "Generated",
+                    value: new Date().toLocaleDateString(),
+                  },
                 ].map((s) => (
-                  <div key={s.label} className="rounded-lg bg-muted/40 px-3 py-2.5">
-                    <div className="text-xs text-muted-foreground">{s.label}</div>
-                    <div className="text-base font-semibold text-foreground mt-0.5">{s.value}</div>
+                  <div
+                    key={s.label}
+                    className="rounded-lg bg-muted/40 px-3 py-2.5"
+                  >
+                    <div className="text-xs text-muted-foreground">
+                      {s.label}
+                    </div>
+                    <div className="text-base font-semibold text-foreground mt-0.5">
+                      {s.value}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -235,10 +290,7 @@ function ResultsPage() {
             subtitle="Generated based on the composite risk profile. Confirm with your physician."
           />
           <div className="mt-5 grid lg:grid-cols-2 gap-4">
-            <RecommendationCard
-              icon={Stethoscope}
-              title="Specialist referrals"
-            >
+            <RecommendationCard icon={Stethoscope} title="Specialist referrals">
               <ul className="space-y-3">
                 {(recs.referrals || []).map((r: any) => (
                   <li key={r.specialist} className="flex items-start gap-3">
@@ -247,12 +299,16 @@ function ResultsPage() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-medium text-foreground">{r.specialist}</p>
+                        <p className="text-sm font-medium text-foreground">
+                          {r.specialist}
+                        </p>
                         <span className="text-[10px] uppercase font-semibold tracking-wide bg-accent/10 text-accent px-2 py-0.5 rounded-full">
                           {r.urgency}
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">{r.reason}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {r.reason}
+                      </p>
                     </div>
                   </li>
                 ))}
@@ -270,12 +326,20 @@ function ResultsPage() {
               </ul>
             </RecommendationCard>
 
-            <RecommendationCard icon={ClipboardList} title="Monitoring schedule">
+            <RecommendationCard
+              icon={ClipboardList}
+              title="Monitoring schedule"
+            >
               <div className="divide-y divide-border">
                 {(recs.monitoring || []).map((m: any) => (
-                  <div key={m.item} className="py-2.5 flex items-center justify-between text-sm">
+                  <div
+                    key={m.item}
+                    className="py-2.5 flex items-center justify-between text-sm"
+                  >
                     <span className="text-foreground">{m.item}</span>
-                    <span className="text-xs text-muted-foreground">{m.frequency}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {m.frequency}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -305,12 +369,26 @@ function ResultsPage() {
   );
 }
 
-function SectionTitle({ kicker, title, subtitle }: { kicker: string; title: string; subtitle?: string }) {
+function SectionTitle({
+  kicker,
+  title,
+  subtitle,
+}: {
+  kicker: string;
+  title: string;
+  subtitle?: string;
+}) {
   return (
     <div className="max-w-2xl">
-      <p className="text-xs font-semibold uppercase tracking-wider text-accent">{kicker}</p>
-      <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">{title}</h2>
-      {subtitle && <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>}
+      <p className="text-xs font-semibold uppercase tracking-wider text-accent">
+        {kicker}
+      </p>
+      <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
+        {title}
+      </h2>
+      {subtitle && (
+        <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>
+      )}
     </div>
   );
 }
@@ -375,7 +453,10 @@ function OrganAccordion({ organ }: { organ: OrganResult }) {
         className="w-full px-5 py-4 flex items-center justify-between gap-4 text-left hover:bg-muted/40 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <span className={`h-2.5 w-2.5 rounded-full`} style={{ backgroundColor: `var(--${meta.tone})` }} />
+          <span
+            className={`h-2.5 w-2.5 rounded-full`}
+            style={{ backgroundColor: `var(--${meta.tone})` }}
+          />
           <div>
             <h3 className="font-semibold text-foreground">{organ.name}</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -402,14 +483,19 @@ function OrganAccordion({ organ }: { organ: OrganResult }) {
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Why this risk level?
                 </h4>
-                <p className="mt-2 text-sm text-foreground leading-relaxed">{organ.explanation}</p>
+                <p className="mt-2 text-sm text-foreground leading-relaxed">
+                  {organ.explanation}
+                </p>
 
                 <h4 className="mt-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Highlighted insights
                 </h4>
                 <ul className="mt-2 space-y-1.5">
                   {organ.findings.map((f, i) => (
-                    <li key={i} className="text-sm text-foreground flex gap-2.5">
+                    <li
+                      key={i}
+                      className="text-sm text-foreground flex gap-2.5"
+                    >
                       <span
                         className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0"
                         style={{ backgroundColor: `var(--${meta.tone})` }}
@@ -430,22 +516,43 @@ function OrganAccordion({ organ }: { organ: OrganResult }) {
                       <table className="w-full text-sm">
                         <thead className="bg-muted/40 text-xs text-muted-foreground">
                           <tr>
-                            <th className="text-left px-3 py-2 font-medium">Marker</th>
-                            <th className="text-left px-3 py-2 font-medium">Value</th>
-                            <th className="text-left px-3 py-2 font-medium">Normal</th>
+                            <th className="text-left px-3 py-2 font-medium">
+                              Marker
+                            </th>
+                            <th className="text-left px-3 py-2 font-medium">
+                              Value
+                            </th>
+                            <th className="text-left px-3 py-2 font-medium">
+                              Normal
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
                           {organ.abnormalValues.map((v) => (
-                            <tr key={v.name} className={v.flag ? "bg-risk-high-soft/30" : ""}>
-                              <td className="px-3 py-2 text-foreground">{v.name}</td>
+                            <tr
+                              key={v.name}
+                              className={v.flag ? "bg-risk-high-soft/30" : ""}
+                            >
+                              <td className="px-3 py-2 text-foreground">
+                                {v.name}
+                              </td>
                               <td className="px-3 py-2 font-medium flex items-center gap-1.5">
-                                {v.flag && <AlertTriangle className="h-3.5 w-3.5 text-risk-high" />}
-                                <span className={v.flag ? "text-risk-high" : "text-foreground"}>
+                                {v.flag && (
+                                  <AlertTriangle className="h-3.5 w-3.5 text-risk-high" />
+                                )}
+                                <span
+                                  className={
+                                    v.flag
+                                      ? "text-risk-high"
+                                      : "text-foreground"
+                                  }
+                                >
                                   {v.value}
                                 </span>
                               </td>
-                              <td className="px-3 py-2 text-muted-foreground">{v.normal}</td>
+                              <td className="px-3 py-2 text-muted-foreground">
+                                {v.normal}
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -461,10 +568,28 @@ function OrganAccordion({ organ }: { organ: OrganResult }) {
                     </h4>
                     <div className="mt-2 h-44">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={organ.trend} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-                          <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                          <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                        <LineChart
+                          data={organ.trend}
+                          margin={{ top: 8, right: 8, left: -16, bottom: 0 }}
+                        >
+                          <CartesianGrid
+                            stroke="var(--border)"
+                            strokeDasharray="3 3"
+                            vertical={false}
+                          />
+                          <XAxis
+                            dataKey="month"
+                            stroke="var(--muted-foreground)"
+                            fontSize={11}
+                            tickLine={false}
+                            axisLine={false}
+                          />
+                          <YAxis
+                            stroke="var(--muted-foreground)"
+                            fontSize={11}
+                            tickLine={false}
+                            axisLine={false}
+                          />
                           <Tooltip
                             contentStyle={{
                               background: "var(--card)",
@@ -486,7 +611,11 @@ function OrganAccordion({ organ }: { organ: OrganResult }) {
                             dataKey="value"
                             stroke={`var(--${meta.tone})`}
                             strokeWidth={2.5}
-                            dot={{ r: 3, strokeWidth: 0, fill: `var(--${meta.tone})` }}
+                            dot={{
+                              r: 3,
+                              strokeWidth: 0,
+                              fill: `var(--${meta.tone})`,
+                            }}
                           />
                         </LineChart>
                       </ResponsiveContainer>

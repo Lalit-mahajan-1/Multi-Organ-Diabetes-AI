@@ -7,7 +7,11 @@ import { FileUploader } from "@/components/FileUploader";
 import { PatientForm } from "@/components/PatientForm";
 import { StepIndicator } from "@/components/StepIndicator";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { assessmentStore, type UploadedFile, type PatientInfo } from "@/lib/assessmentStore";
+import {
+  assessmentStore,
+  type UploadedFile,
+  type PatientInfo,
+} from "@/lib/assessmentStore";
 import { apiUploadFiles } from "@/lib/api";
 
 export const Route = createFileRoute("/assessment")({
@@ -29,7 +33,8 @@ function AssessmentPage() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const requiredFilled = patient.age.trim() !== "" && patient.duration.trim() !== "";
+  const requiredFilled =
+    patient.age.trim() !== "" && patient.duration.trim() !== "";
   const canSubmit = requiredFilled && files.length > 0 && !uploading;
 
   const step = useMemo(() => {
@@ -72,7 +77,9 @@ function AssessmentPage() {
       navigate({ to: "/processing" });
     } catch (err) {
       console.error("Upload failed:", err);
-      setError(err instanceof Error ? err.message : "Upload failed. Please try again.");
+      setError(
+        err instanceof Error ? err.message : "Upload failed. Please try again.",
+      );
       setUploading(false);
     }
   }
@@ -91,28 +98,34 @@ function AssessmentPage() {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium mb-4 border border-accent/20">
             <ShieldCheck className="h-3.5 w-3.5" />
-            Clinical-grade AI · HIPAA-aligned workflow
+            Structured clinical screening
           </div>
           <h1 className="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-foreground">
-            Multi-organ diabetes <span className="text-gradient-primary">risk assessment</span>
+            Multi-organ diabetes{" "}
+            <span className="text-gradient-primary">risk assessment</span>
           </h1>
           <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-            Upload medical reports and clinical images to receive an AI-assisted risk profile across
-            retina, kidney, heart, foot, and blood markers — designed for use alongside qualified
-            medical advice.
+            Upload medical reports and clinical images to receive an AI-assisted
+            risk profile across retina, kidney, heart, foot, and blood markers —
+            designed for use alongside qualified medical advice.
           </p>
         </motion.section>
 
         {/* Steps */}
         <div className="mt-10 max-w-3xl mx-auto">
-          <StepIndicator steps={["Upload", "Patient Info", "Ready"]} current={step} />
+          <StepIndicator
+            steps={["Upload", "Patient Info", "Ready"]}
+            current={step}
+          />
         </div>
 
         {/* Body */}
         <div className="mt-8 grid lg:grid-cols-5 gap-6">
           <section className="lg:col-span-3 clinical-card p-6">
             <header className="mb-5">
-              <h2 className="text-lg font-display font-semibold text-foreground">1. Medical reports & images</h2>
+              <h2 className="text-lg font-display font-semibold text-foreground">
+                1. Medical reports & images
+              </h2>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Files are auto-classified by type. Add as many as needed.
               </p>
@@ -122,7 +135,9 @@ function AssessmentPage() {
 
           <section className="lg:col-span-2 clinical-card p-6">
             <header className="mb-5">
-              <h2 className="text-lg font-display font-semibold text-foreground">2. Patient information</h2>
+              <h2 className="text-lg font-display font-semibold text-foreground">
+                2. Patient information
+              </h2>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Required: age and duration of diabetes.
               </p>

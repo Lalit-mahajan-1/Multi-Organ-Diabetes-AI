@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { riskMeta, type RiskLevel } from "@/lib/mockData";
+import { riskMeta, type RiskLevel } from "@/lib/riskMeta";
 
 const colorVar: Record<RiskLevel, string> = {
   low: "var(--risk-low)",
@@ -43,7 +43,10 @@ export function RiskGauge({
         </PieChart>
       </ResponsiveContainer>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="text-4xl font-semibold tracking-tight" style={{ color }}>
+        <div
+          className="text-4xl font-semibold tracking-tight"
+          style={{ color }}
+        >
           {score}
         </div>
         <div className="text-xs uppercase tracking-wider text-muted-foreground mt-1">

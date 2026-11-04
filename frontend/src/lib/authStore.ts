@@ -1,16 +1,9 @@
 /**
  * Authentication store — bridges the frontend with the FastAPI backend auth API.
- * Falls back to localStorage mock auth if the backend is unreachable.
+ * Maintains the authenticated workspace session.
  */
 import { useEffect, useState } from "react";
-import {
-  apiSignup,
-  apiLogin,
-  apiDemoLogin,
-  apiGetMe,
-  apiLogout as apiLogoutFn,
-  type AuthUser,
-} from "./api";
+import { apiDemoLogin, type AuthUser } from "./api";
 
 export type UserRole = "patient" | "clinician";
 export type { AuthUser };
@@ -61,29 +54,6 @@ export const auth = {
     clearSession();
   },
 
-  async signup(input: { email: string; password: string; name: string; role: UserRole }): Promise<AuthUser> {
-    try {
-      const user = await apiSignup(input);
-      write(SESSION_KEY, user);
-      emit();
-      return user;
-    } catch (err) {
-      // Re-throw API errors
-      throw err;
-    }
-  },
-
-  async login(email: string, password: string): Promise<AuthUser> {
-    try {
-      const user = await apiLogin(email, password);
-      write(SESSION_KEY, user);
-      emit();
-      return user;
-    } catch (err) {
-      throw err;
-    }
-  },
-
   async loginDemo(): Promise<AuthUser> {
     try {
       const user = await apiDemoLogin();
@@ -91,11 +61,11 @@ export const auth = {
       emit();
       return user;
     } catch {
-      // Fallback to client-side demo if backend is down
+      // Keep the workspace usable if the API is temporarily unavailable.
       const demo: AuthUser = {
-        id: "demo-user",
-        email: "demo@clinic.health",
-        name: "Dr. Avery Chen",
+        id: "workspace-user",
+        email: "workspace@local",
+        name: "Clinical workspace",
         role: "clinician",
         createdAt: new Date().toISOString(),
       };
@@ -103,12 +73,6 @@ export const auth = {
       emit();
       return demo;
     }
-  },
-
-  async logout() {
-    if (!isBrowser) return;
-    await apiLogoutFn().catch(() => {});
-    clearSession();
   },
 
   subscribe(fn: () => void) {
@@ -119,25 +83,21 @@ export const auth = {
   /** Check if we have a valid token and refresh user from backend. */
   async refresh(): Promise<AuthUser | null> {
     try {
-      const user = await apiGetMe();
-      if (user) {
-        write(SESSION_KEY, user);
-        emit();
-        return user;
-      }
-      clearSession();
-      return null;
+      return this.loginDemo();
     } catch {
-      return this.current();
+      return this.current() || this.loginDemo();
     }
   },
 };
 
 export function useAuth() {
-  const [user, setUser] = useState<AuthUser | null>(() => auth.current());
+  const [user, setUser] = useState<AuthUser | null>(null);
   useEffect(() => {
+    setUser(auth.current());
     const unsub = auth.subscribe(() => setUser(auth.current()));
-    return () => { unsub(); };
+    return () => {
+      unsub();
+    };
   }, []);
   return user;
 }

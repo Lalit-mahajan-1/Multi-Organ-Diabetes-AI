@@ -1,6 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowLeft, AlertTriangle, CheckCircle2, ClipboardList, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  AlertTriangle,
+  CheckCircle2,
+  ClipboardList,
+  ShieldCheck,
+  Brain,
+} from "lucide-react";
 import { AppHeader, MedicalDisclaimer } from "@/components/AppHeader";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { getOrganBySlug, organCatalog } from "@/lib/organCatalog";
@@ -48,7 +55,10 @@ function OrganDetailPage() {
                   color: organ.accent,
                 }}
               >
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: organ.accent }} />
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: organ.accent }}
+                />
                 Organ focus
               </div>
               <h1 className="mt-4 text-3xl sm:text-4xl font-display font-semibold tracking-tight text-foreground">
@@ -66,7 +76,9 @@ function OrganDetailPage() {
               <div className="flex items-center gap-3">
                 <div
                   className="h-12 w-12 rounded-2xl flex items-center justify-center text-sm font-bold text-white shadow-elevated"
-                  style={{ background: `linear-gradient(135deg, ${organ.accent}, color-mix(in oklab, ${organ.accent} 55%, black))` }}
+                  style={{
+                    background: `linear-gradient(135deg, ${organ.accent}, color-mix(in oklab, ${organ.accent} 55%, black))`,
+                  }}
                 >
                   {organ.badge}
                 </div>
@@ -74,21 +86,51 @@ function OrganDetailPage() {
                   <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground font-semibold">
                     Quick summary
                   </div>
-                  <div className="text-base font-semibold text-foreground">{organ.summary}</div>
+                  <div className="text-base font-semibold text-foreground">
+                    {organ.summary}
+                  </div>
                 </div>
               </div>
 
               <div className="mt-5 grid grid-cols-1 gap-3">
                 {organ.keyPoints.map((point) => (
-                  <div key={point} className="flex items-start gap-2 rounded-xl bg-muted/35 px-3 py-2.5">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4" style={{ color: organ.accent }} />
-                    <span className="text-sm text-foreground leading-relaxed">{point}</span>
+                  <div
+                    key={point}
+                    className="flex items-start gap-2 rounded-xl bg-muted/35 px-3 py-2.5"
+                  >
+                    <CheckCircle2
+                      className="mt-0.5 h-4 w-4"
+                      style={{ color: organ.accent }}
+                    />
+                    <span className="text-sm text-foreground leading-relaxed">
+                      {point}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </motion.section>
+
+        {organ.slug === "kidneys" && (
+          <section className="mt-6 clinical-card p-5 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="font-semibold text-foreground">
+                Run the CKD screening model
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Enter available blood and urinalysis values for a model-based
+                screening signal.
+              </p>
+            </div>
+            <Link
+              to="/kidney"
+              className="btn-premium inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold"
+            >
+              <Brain className="h-4 w-4" /> Analyze kidney risk
+            </Link>
+          </section>
+        )}
 
         <section className="mt-8 grid lg:grid-cols-3 gap-4">
           <InfoCard
@@ -98,21 +140,23 @@ function OrganDetailPage() {
           >
             <ul className="space-y-2">
               {organ.commonChecks.map((item) => (
-                <li key={item} className="text-sm text-foreground leading-relaxed">
+                <li
+                  key={item}
+                  className="text-sm text-foreground leading-relaxed"
+                >
                   {item}
                 </li>
               ))}
             </ul>
           </InfoCard>
 
-          <InfoCard
-            icon={ShieldCheck}
-            title="Self-care"
-            accent={organ.accent}
-          >
+          <InfoCard icon={ShieldCheck} title="Self-care" accent={organ.accent}>
             <ul className="space-y-2">
               {organ.selfCare.map((item) => (
-                <li key={item} className="text-sm text-foreground leading-relaxed">
+                <li
+                  key={item}
+                  className="text-sm text-foreground leading-relaxed"
+                >
                   {item}
                 </li>
               ))}
@@ -126,7 +170,10 @@ function OrganDetailPage() {
           >
             <ul className="space-y-2">
               {organ.urgentSigns.map((item) => (
-                <li key={item} className="text-sm text-foreground leading-relaxed">
+                <li
+                  key={item}
+                  className="text-sm text-foreground leading-relaxed"
+                >
                   {item}
                 </li>
               ))}
@@ -143,13 +190,16 @@ function OrganDetailPage() {
               Useful conversation starters
             </h2>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              Bring these to your appointment if you want to understand this organ system in more detail.
+              Bring these to your appointment if you want to understand this
+              organ system in more detail.
             </p>
           </div>
           <div className="mt-5 grid sm:grid-cols-2 gap-4">
             {organ.doctorQuestions.map((question) => (
               <div key={question} className="clinical-card p-4">
-                <p className="text-sm text-foreground leading-relaxed">{question}</p>
+                <p className="text-sm text-foreground leading-relaxed">
+                  {question}
+                </p>
               </div>
             ))}
           </div>
@@ -174,13 +224,21 @@ function OrganDetailPage() {
                 <Link
                   key={item.slug}
                   to={item.path as any}
-                  params={item.path === "/tongue" ? undefined : ({ organId: item.slug } as any)}
+                  params={
+                    item.path === "/tongue"
+                      ? undefined
+                      : ({ organId: item.slug } as any)
+                  }
                   className="clinical-card p-4 hover:border-primary/40 transition-colors"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <h3 className="font-semibold text-foreground">{item.title}</h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">{item.subtitle}</p>
+                      <h3 className="font-semibold text-foreground">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {item.subtitle}
+                      </p>
                     </div>
                     <div
                       className="h-10 w-10 rounded-xl flex items-center justify-center text-xs font-bold text-white"

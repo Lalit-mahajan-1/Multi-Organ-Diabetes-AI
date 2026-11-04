@@ -1,11 +1,19 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Activity, HeartPulse, ShieldCheck, Calendar, ArrowRight, ClipboardList, TrendingUp } from "lucide-react";
+import {
+  Activity,
+  HeartPulse,
+  ShieldCheck,
+  Calendar,
+  ArrowRight,
+  ClipboardList,
+  TrendingUp,
+} from "lucide-react";
 import { AppHeader, MedicalDisclaimer } from "@/components/AppHeader";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { history } from "@/lib/authStore";
 import { organCatalog } from "@/lib/organCatalog";
-import { riskMeta } from "@/lib/mockData";
+import { riskMeta } from "@/lib/riskMeta";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/dashboard")({
@@ -49,24 +57,31 @@ function PatientDashboard({
 
       <main className="mx-auto max-w-7xl px-6 py-10">
         <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Patient organ dashboard</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+            Patient organ dashboard
+          </p>
           <h1 className="mt-2 text-3xl sm:text-4xl font-display font-semibold tracking-tight text-foreground">
-            Welcome back, <span className="text-gradient-primary">{userName}</span>.
+            Welcome back,{" "}
+            <span className="text-gradient-primary">{userName}</span>.
           </h1>
           <p className="mt-3 text-sm text-muted-foreground max-w-2xl leading-relaxed">
-            Choose an organ system to review risk signals, care tips, and warning signs.
+            Choose an organ system to review risk signals, care tips, and
+            warning signs.
           </p>
         </div>
 
         <section className="mt-10">
           <div className="flex items-end justify-between gap-4 mb-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Organ cards</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                Organ cards
+              </p>
               <h2 className="mt-1 text-2xl font-display font-semibold tracking-tight text-foreground">
                 Pick a system to review
               </h2>
               <p className="mt-1.5 text-sm text-muted-foreground">
-                Each card opens a focused guide for symptoms, checks, and questions to bring to your doctor.
+                Each card opens a focused guide for symptoms, checks, and
+                questions to bring to your doctor.
               </p>
             </div>
           </div>
@@ -81,7 +96,11 @@ function PatientDashboard({
               >
                 <Link
                   to={organ.path as any}
-                  params={organ.path === "/tongue" ? undefined : ({ organId: organ.slug } as any)}
+                  params={
+                    organ.path === "/tongue"
+                      ? undefined
+                      : ({ organId: organ.slug } as any)
+                  }
                   className="group clinical-card h-full p-5 flex flex-col justify-between hover:border-primary/40 hover:shadow-elevated transition-all"
                 >
                   <div>
@@ -90,7 +109,9 @@ function PatientDashboard({
                         <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                           {organ.subtitle}
                         </div>
-                        <h3 className="mt-1 text-lg font-semibold text-foreground">{organ.title}</h3>
+                        <h3 className="mt-1 text-lg font-semibold text-foreground">
+                          {organ.title}
+                        </h3>
                       </div>
                       <div
                         className="h-11 w-11 rounded-xl flex items-center justify-center text-sm font-bold text-white shadow-elevated"
@@ -101,13 +122,17 @@ function PatientDashboard({
                         {organ.badge}
                       </div>
                     </div>
-                    <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{organ.summary}</p>
+                    <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                      {organ.summary}
+                    </p>
                   </div>
 
                   <div className="mt-5">
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>{organ.keyPoints.length} checkpoints</span>
-                      <span className="group-hover:text-foreground transition-colors">Open details</span>
+                      <span className="group-hover:text-foreground transition-colors">
+                        Open details
+                      </span>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {organ.keyPoints.slice(0, 2).map((point) => (
@@ -129,7 +154,9 @@ function PatientDashboard({
         <section className="mt-10">
           <div className="flex items-end justify-between gap-4 mb-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">History</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                History
+              </p>
               <h2 className="mt-1 text-2xl font-display font-semibold tracking-tight text-foreground">
                 Past assessments
               </h2>
@@ -138,7 +165,9 @@ function PatientDashboard({
 
           {records.length === 0 ? (
             <div className="clinical-card p-8 text-center">
-              <p className="text-sm text-muted-foreground">No assessments yet.</p>
+              <p className="text-sm text-muted-foreground">
+                No assessments yet.
+              </p>
             </div>
           ) : (
             <div className="grid gap-3">
@@ -162,7 +191,9 @@ function PatientDashboard({
                         <Activity className="h-5 w-5" />
                       </div>
                       <div>
-                        <div className="text-sm font-semibold text-foreground">{r.patientName}</div>
+                        <div className="text-sm font-semibold text-foreground">
+                          {r.patientName}
+                        </div>
                         <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
                           <Calendar className="h-3 w-3" />
                           {formatDate(r.createdAt)} · {r.organCount} organs
@@ -171,12 +202,20 @@ function PatientDashboard({
                     </div>
                     <div className="flex items-center gap-5">
                       <div className="text-right">
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Risk</div>
-                        <div className={`text-sm font-semibold ${meta.text}`}>{meta.label}</div>
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                          Risk
+                        </div>
+                        <div className={`text-sm font-semibold ${meta.text}`}>
+                          {meta.label}
+                        </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Score</div>
-                        <div className="text-sm font-semibold text-foreground">{r.overallScore}</div>
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                          Score
+                        </div>
+                        <div className="text-sm font-semibold text-foreground">
+                          {r.overallScore}
+                        </div>
                       </div>
                       <ArrowRight className="h-4 w-4 text-muted-foreground" />
                     </div>
@@ -207,7 +246,9 @@ function ClinicianDashboard({
   const lastRisk = records[0]?.overallRisk;
   const avgScore =
     records.length > 0
-      ? Math.round(records.reduce((a, r) => a + r.overallScore, 0) / records.length)
+      ? Math.round(
+          records.reduce((a, r) => a + r.overallScore, 0) / records.length,
+        )
       : null;
 
   return (
@@ -229,25 +270,46 @@ function ClinicianDashboard({
                 {greeting()} · Clinician workspace
               </p>
               <h1 className="mt-2 text-3xl sm:text-4xl font-display font-semibold tracking-tight text-foreground">
-                Welcome back, <span className="text-gradient-primary">{userName}</span>.
+                Welcome back,{" "}
+                <span className="text-gradient-primary">{userName}</span>.
               </h1>
               <p className="mt-3 text-sm text-muted-foreground max-w-xl leading-relaxed">
-                Run a new multi-organ AI risk assessment, or review previous reports. Every analysis is explainable, auditable, and aligned with clinical reference ranges.
+                Run a new multi-organ AI risk assessment, or review previous
+                reports. Every analysis is explainable, auditable, and aligned
+                with clinical reference ranges.
               </p>
-
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <StatCard icon={ClipboardList} label="Assessments" value={records.length.toString()} hint="Total reports" />
-              <StatCard icon={TrendingUp} label="Avg risk score" value={avgScore !== null ? `${avgScore}` : "—"} hint="Across all reports" />
+              <StatCard
+                icon={ClipboardList}
+                label="Assessments"
+                value={records.length.toString()}
+                hint="Total reports"
+              />
+              <StatCard
+                icon={TrendingUp}
+                label="Avg risk score"
+                value={avgScore !== null ? `${avgScore}` : "—"}
+                hint="Across all reports"
+              />
               <StatCard
                 icon={HeartPulse}
                 label="Latest risk"
                 value={lastRisk ? riskMeta[lastRisk].label : "—"}
-                hint={records[0]?.createdAt ? formatDate(records[0].createdAt) : "No reports yet"}
+                hint={
+                  records[0]?.createdAt
+                    ? formatDate(records[0].createdAt)
+                    : "No reports yet"
+                }
                 tone={lastRisk}
               />
-              <StatCard icon={ShieldCheck} label="Confidence" value="98.2%" hint="Model reliability" />
+              <StatCard
+                icon={ShieldCheck}
+                label="Confidence"
+                value="98.2%"
+                hint="Model reliability"
+              />
             </div>
           </div>
         </motion.section>
@@ -255,7 +317,9 @@ function ClinicianDashboard({
         <section className="mt-10">
           <div className="flex items-end justify-between gap-4 mb-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">History</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                History
+              </p>
               <h2 className="mt-1 text-2xl font-display font-semibold tracking-tight text-foreground">
                 Past assessments
               </h2>
@@ -264,7 +328,9 @@ function ClinicianDashboard({
 
           {records.length === 0 ? (
             <div className="clinical-card p-8 text-center">
-              <p className="text-sm text-muted-foreground">No assessments yet.</p>
+              <p className="text-sm text-muted-foreground">
+                No assessments yet.
+              </p>
             </div>
           ) : (
             <div className="grid gap-3">
@@ -288,7 +354,9 @@ function ClinicianDashboard({
                         <Activity className="h-5 w-5" />
                       </div>
                       <div>
-                        <div className="text-sm font-semibold text-foreground">{r.patientName}</div>
+                        <div className="text-sm font-semibold text-foreground">
+                          {r.patientName}
+                        </div>
                         <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
                           <Calendar className="h-3 w-3" />
                           {formatDate(r.createdAt)} · {r.organCount} organs
@@ -297,12 +365,20 @@ function ClinicianDashboard({
                     </div>
                     <div className="flex items-center gap-5">
                       <div className="text-right">
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Risk</div>
-                        <div className={`text-sm font-semibold ${meta.text}`}>{meta.label}</div>
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                          Risk
+                        </div>
+                        <div className={`text-sm font-semibold ${meta.text}`}>
+                          {meta.label}
+                        </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Score</div>
-                        <div className="text-sm font-semibold text-foreground">{r.overallScore}</div>
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                          Score
+                        </div>
+                        <div className="text-sm font-semibold text-foreground">
+                          {r.overallScore}
+                        </div>
                       </div>
                       <ArrowRight className="h-4 w-4 text-muted-foreground" />
                     </div>
@@ -344,13 +420,20 @@ function StatCard({
       <div className="flex items-center gap-2">
         <div
           className="h-7 w-7 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: `color-mix(in oklab, ${toneColor} 14%, transparent)`, color: toneColor }}
+          style={{
+            backgroundColor: `color-mix(in oklab, ${toneColor} 14%, transparent)`,
+            color: toneColor,
+          }}
         >
           <Icon className="h-4 w-4" />
         </div>
-        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+          {label}
+        </span>
       </div>
-      <div className="mt-3 text-2xl font-display font-semibold tracking-tight text-foreground">{value}</div>
+      <div className="mt-3 text-2xl font-display font-semibold tracking-tight text-foreground">
+        {value}
+      </div>
       <div className="text-[11px] text-muted-foreground mt-0.5">{hint}</div>
     </div>
   );
@@ -368,5 +451,9 @@ function firstName(name: string) {
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  return new Date(iso).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }

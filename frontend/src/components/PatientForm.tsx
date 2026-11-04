@@ -12,7 +12,11 @@ const SYMPTOMS = [
   "Recurrent infections",
 ];
 
-export function PatientForm({ onChange }: { onChange: (p: PatientInfo) => void }) {
+export function PatientForm({
+  onChange,
+}: {
+  onChange: (p: PatientInfo) => void;
+}) {
   const [data, setData] = useState<PatientInfo>(assessmentStore.get().patient);
 
   const update = (patch: Partial<PatientInfo>) => {
@@ -24,7 +28,11 @@ export function PatientForm({ onChange }: { onChange: (p: PatientInfo) => void }
 
   const toggleSymptom = (s: string) => {
     const exists = data.symptoms.includes(s);
-    update({ symptoms: exists ? data.symptoms.filter((x) => x !== s) : [...data.symptoms, s] });
+    update({
+      symptoms: exists
+        ? data.symptoms.filter((x) => x !== s)
+        : [...data.symptoms, s],
+    });
   };
 
   const inputCls =
@@ -56,7 +64,7 @@ export function PatientForm({ onChange }: { onChange: (p: PatientInfo) => void }
             type="number"
             min="1"
             max="120"
-            placeholder="e.g. 54"
+            placeholder="Enter age"
             value={data.age}
             onChange={(e) => update({ age: e.target.value })}
             className={inputCls}
@@ -66,7 +74,7 @@ export function PatientForm({ onChange }: { onChange: (p: PatientInfo) => void }
           <input
             type="number"
             min="0"
-            placeholder="e.g. 8"
+            placeholder="Enter duration"
             value={data.duration}
             onChange={(e) => update({ duration: e.target.value })}
             className={inputCls}
@@ -75,7 +83,7 @@ export function PatientForm({ onChange }: { onChange: (p: PatientInfo) => void }
         <Field label="Current medications">
           <input
             type="text"
-            placeholder="e.g. Metformin 500mg"
+            placeholder="Enter medications"
             value={data.medications}
             onChange={(e) => update({ medications: e.target.value })}
             className={inputCls}
@@ -84,7 +92,7 @@ export function PatientForm({ onChange }: { onChange: (p: PatientInfo) => void }
         <Field label="Blood pressure (systolic/diastolic)">
           <input
             type="text"
-            placeholder="e.g. 130/85"
+            placeholder="Enter blood pressure"
             value={data.bloodPressure}
             onChange={(e) => update({ bloodPressure: e.target.value })}
             className={inputCls}
@@ -94,7 +102,7 @@ export function PatientForm({ onChange }: { onChange: (p: PatientInfo) => void }
           <input
             type="number"
             min="1"
-            placeholder="e.g. 78"
+            placeholder="Enter weight"
             value={data.weight}
             onChange={(e) => update({ weight: e.target.value })}
             className={inputCls}
@@ -103,7 +111,9 @@ export function PatientForm({ onChange }: { onChange: (p: PatientInfo) => void }
       </div>
 
       <div>
-        <label className="text-xs font-medium text-foreground">Symptoms (select all that apply)</label>
+        <label className="text-xs font-medium text-foreground">
+          Symptoms (select all that apply)
+        </label>
         <div className="mt-2 flex flex-wrap gap-2">
           {SYMPTOMS.map((s) => {
             const active = data.symptoms.includes(s);

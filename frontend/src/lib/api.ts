@@ -2,14 +2,23 @@
  * API client for the backend.
  */
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
+const API_BASE_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:8000"
+).replace(/\/$/, "");
 
 async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
   const headers = new Headers(init?.headers);
-  return fetch(`${API_BASE_URL}${path}`, { ...init, headers, credentials: "include" });
+  return fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    headers,
+    credentials: "include",
+  });
 }
 
-async function apiJSON<T = unknown>(path: string, init?: RequestInit): Promise<T> {
+async function apiJSON<T = unknown>(
+  path: string,
+  init?: RequestInit,
+): Promise<T> {
   const res = await apiFetch(path, init);
   if (!res.ok) {
     const body = await res.json().catch(() => ({ detail: res.statusText }));
@@ -18,38 +27,29 @@ async function apiJSON<T = unknown>(path: string, init?: RequestInit): Promise<T
   return res.json() as Promise<T>;
 }
 
-// ── Auth ────────────────────────────────────────────────────
+// ── Demo session ───────────────────────────────────────────
 export interface AuthUser {
-  id: string; email: string; name: string;
-  role: "patient" | "clinician"; createdAt: string;
-}
-
-interface TokenRes { access_token: string; token_type: string; user: AuthUser; }
-
-export async function apiSignup(body: { email: string; password: string; name: string; role: string }): Promise<AuthUser> {
-  const { user } = await apiJSON<TokenRes>("/api/auth/signup", {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
-  });
-  return user;
-}
-
-export async function apiLogin(email: string, password: string): Promise<AuthUser> {
-  const { user } = await apiJSON<TokenRes>("/api/auth/login", {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }),
-  });
-  return user;
+  id: string;
+  email: string;
+  name: string;
+  role: "patient" | "clinician";
+  createdAt: string;
 }
 
 export async function apiDemoLogin(): Promise<AuthUser> {
-  const { user } = await apiJSON<TokenRes>("/api/auth/demo", { method: "POST" });
+  const { user } = await apiJSON<{ user: AuthUser }>("/api/auth/demo", {
+    method: "POST",
+  });
   return user;
 }
 
 export async function apiGetMe(): Promise<AuthUser | null> {
-  try { return await apiJSON<AuthUser>("/api/auth/me"); } catch { return null; }
+  try {
+    return await apiJSON<AuthUser>("/api/auth/me");
+  } catch {
+    return null;
+  }
 }
-
-export async function apiLogout() { await apiFetch("/api/auth/logout", { method: "POST" }); }
 
 // ── Tongue Analysis ────────────────────────────────────────
 export interface TongueAnalysisResponse {
@@ -60,7 +60,10 @@ export interface TongueAnalysisResponse {
   prediction_details: {
     label: "diabetic" | "non_diabetic";
     confidence: number;
-    confidence_category?: "Low confidence" | "Medium confidence" | "High confidence";
+    confidence_category?:
+      | "Low confidence"
+      | "Medium confidence"
+      | "High confidence";
     raw_model_probability_for_class_index_1?: number;
     estimated_diabetic_risk_percent?: number;
     probabilities: {
@@ -70,7 +73,10 @@ export interface TongueAnalysisResponse {
   };
   probability: number;
   confidence: number;
-  confidence_category?: "Low confidence" | "Medium confidence" | "High confidence";
+  confidence_category?:
+    | "Low confidence"
+    | "Medium confidence"
+    | "High confidence";
   raw_model_probability_for_class_index_1?: number;
   estimated_diabetic_risk_percent?: number;
   risk_score: number;
@@ -98,7 +104,9 @@ export interface TongueAnalysisResponse {
   stored?: boolean;
 }
 
-export async function apiAnalyzeTongue(file: File): Promise<TongueAnalysisResponse> {
+export async function apiAnalyzeTongue(
+  file: File,
+): Promise<TongueAnalysisResponse> {
   const form = new FormData();
   form.append("file", file);
   const res = await apiFetch("/api/tongue/analyze", {
@@ -109,7 +117,38 @@ export async function apiAnalyzeTongue(file: File): Promise<TongueAnalysisRespon
     const body = await res.json().catch(() => ({ detail: res.statusText }));
     throw new Error(body.detail || `Tongue analysis failed`);
   }
+
   return res.json() as Promise<TongueAnalysisResponse>;
+}
+
+export interface KidneyAnalysisResponse {
+  model_name: string;
+  model_description: string;
+  prediction: string;
+  probability: number;
+  risk_score: number;
+  risk_level: "LOW" | "MODERATE" | "HIGH" | "VERY HIGH";
+  confidence: number;
+  findings: string[];
+  analysis_id?: string;
+  stored?: boolean;
+}
+
+export async function apiAnalyzeKidney(
+  input: Record<string, string | number | null>,
+): Promise<KidneyAnalysisResponse> {
+  return apiJSON<KidneyAnalysisResponse>("/api/kidney/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(
+      Object.fromEntries(
+        Object.entries(input).map(([key, value]) => [
+          key,
+          value === "" ? null : value,
+        ]),
+      ),
+    ),
+  });
 }
 
 // ── Upload ──────────────────────────────────────────────────
@@ -119,7 +158,10 @@ export interface UploadResponse {
   message: string;
 }
 
-export async function apiUploadFiles(files: File[], patientData: Record<string, unknown>): Promise<UploadResponse> {
+export async function apiUploadFiles(
+  files: File[],
+  patientData: Record<string, unknown>,
+): Promise<UploadResponse> {
   const form = new FormData();
   for (const f of files) form.append("files", f);
   form.append("patient_data", JSON.stringify(patientData));
@@ -135,7 +177,9 @@ export async function apiUploadFiles(files: File[], patientData: Record<string, 
 export interface AnalysisEvent {
   step: string;
   status: "processing" | "complete" | "warning" | "error";
-  label?: string; score?: number; message?: string;
+  label?: string;
+  score?: number;
+  message?: string;
   session_id?: string;
 }
 
@@ -171,27 +215,38 @@ export function apiAnalyze(
             try {
               const ev = JSON.parse(line.slice(5).trim()) as AnalysisEvent;
               onEvent(ev);
-              if (ev.step === "complete" && ev.status === "complete") { onDone(); return; }
-            } catch { /* skip */ }
+              if (ev.step === "complete" && ev.status === "complete") {
+                onDone();
+                return;
+              }
+            } catch {
+              /* skip */
+            }
           }
         }
       }
       onDone();
     } catch (err) {
-      if (!ctrl.signal.aborted) onError(err instanceof Error ? err : new Error(String(err)));
+      if (!ctrl.signal.aborted)
+        onError(err instanceof Error ? err : new Error(String(err)));
     }
   })();
   return () => ctrl.abort();
 }
 
 // ── Results ─────────────────────────────────────────────────
-export async function apiGetResults(sessionId: string) { return apiJSON(`/api/results/${sessionId}`); }
-export async function apiListResults(limit = 20) { return apiJSON(`/api/results?limit=${limit}`); }
+export async function apiGetResults(sessionId: string) {
+  return apiJSON(`/api/results/${sessionId}`);
+}
+export async function apiListResults(limit = 20) {
+  return apiJSON(`/api/results?limit=${limit}`);
+}
 
 // ── Export PDF ──────────────────────────────────────────────
 export async function apiExportReport(sessionId: string): Promise<Blob> {
   const res = await apiFetch("/api/export-report", {
-    method: "POST", headers: { "Content-Type": "application/json" },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ session_id: sessionId }),
   });
   if (!res.ok) throw new Error(`Export failed`);
@@ -201,7 +256,10 @@ export async function apiExportReport(sessionId: string): Promise<Blob> {
 export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }

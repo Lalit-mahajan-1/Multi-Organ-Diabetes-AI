@@ -6,6 +6,8 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEFAULT_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
     "http://localhost:8081",
     "http://127.0.0.1:8081",
     "http://localhost:5173",

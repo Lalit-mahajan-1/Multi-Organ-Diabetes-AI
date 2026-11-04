@@ -1,7 +1,7 @@
-import { Activity, LogOut, LayoutDashboard, Plus, ChevronDown } from "lucide-react";
+import { Activity, LayoutDashboard, Plus, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { auth, useAuth } from "@/lib/authStore";
+import { useAuth } from "@/lib/authStore";
 
 export function AppHeader() {
   const user = useAuth();
@@ -11,7 +11,8 @@ export function AppHeader() {
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     }
     window.addEventListener("mousedown", onClick);
     return () => window.removeEventListener("mousedown", onClick);
@@ -20,9 +21,15 @@ export function AppHeader() {
   return (
     <header className="border-b border-border/70 bg-card/70 backdrop-blur-xl sticky top-0 z-40">
       <div className="mx-auto max-w-7xl px-6 py-3.5 flex items-center justify-between gap-6">
-        <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3 group">
+        <Link
+          to={user ? "/dashboard" : "/"}
+          className="flex items-center gap-3 group"
+        >
           <div className="relative h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-elevated">
-            <Activity className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
+            <Activity
+              className="h-5 w-5 text-primary-foreground"
+              strokeWidth={2.5}
+            />
             <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-accent ring-2 ring-card" />
           </div>
           <div>
@@ -51,37 +58,40 @@ export function AppHeader() {
                   {initials(user.name)}
                 </span>
                 <span className="hidden sm:block text-left">
-                  <span className="block text-xs font-semibold text-foreground leading-tight">{user.name}</span>
-                  <span className="block text-[10px] text-muted-foreground capitalize leading-tight">{user.role}</span>
+                  <span className="block text-xs font-semibold text-foreground leading-tight">
+                    Workspace
+                  </span>
+                  <span className="block text-[10px] text-muted-foreground capitalize leading-tight">
+                    Clinical workspace
+                  </span>
                 </span>
                 <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
               {open && (
                 <div className="absolute right-0 mt-2 w-56 clinical-card-elevated p-1.5 z-50">
-                  <MenuItem icon={LayoutDashboard} onClick={() => { setOpen(false); navigate({ to: "/dashboard" }); }}>
+                  <MenuItem
+                    icon={LayoutDashboard}
+                    onClick={() => {
+                      setOpen(false);
+                      navigate({ to: "/dashboard" });
+                    }}
+                  >
                     Dashboard
                   </MenuItem>
-                  <MenuItem icon={Plus} onClick={() => { setOpen(false); navigate({ to: "/assessment" }); }}>
+                  <MenuItem
+                    icon={Plus}
+                    onClick={() => {
+                      setOpen(false);
+                      navigate({ to: "/assessment" });
+                    }}
+                  >
                     New assessment
                   </MenuItem>
                   <div className="my-1 divider-soft" />
-                  <MenuItem
-                    icon={LogOut}
-                    onClick={() => { setOpen(false); auth.logout(); navigate({ to: "/login" }); }}
-                  >
-                    Sign out
-                  </MenuItem>
                 </div>
               )}
             </div>
-          ) : (
-            <Link
-              to="/login"
-              className="text-sm font-medium text-foreground px-3.5 py-1.5 rounded-full border border-border bg-card hover:bg-muted/60 transition-colors"
-            >
-              Sign in
-            </Link>
-          )}
+          ) : null}
         </div>
       </div>
     </header>
@@ -124,9 +134,9 @@ export function MedicalDisclaimer({ compact = false }: { compact?: boolean }) {
         compact ? "" : "leading-relaxed"
       }`}
     >
-      <span className="font-semibold text-foreground">Medical disclaimer:</span> This is an AI-based
-      risk assessment, not a medical diagnosis. Please consult a qualified healthcare professional
-      for medical advice.
+      <span className="font-semibold text-foreground">Medical disclaimer:</span>{" "}
+      This is an AI-based risk assessment, not a medical diagnosis. Please
+      consult a qualified healthcare professional for medical advice.
     </div>
   );
 }

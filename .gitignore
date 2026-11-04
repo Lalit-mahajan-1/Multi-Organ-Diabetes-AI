@@ -15,6 +15,9 @@ __pycache__/
 
 # Generated model/data artifacts
 backend/app/models/
+!backend/app/models/
+!backend/app/models/*.joblib
+!backend/app/models/*.json
 backend/uploads/
 *.h5
 *.keras

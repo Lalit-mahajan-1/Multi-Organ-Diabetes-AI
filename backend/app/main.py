@@ -5,7 +5,7 @@ import logging
 
 from app.core.config import settings
 from app.core.database import db_manager
-from app.api.routes import auth, tongue
+from app.api.routes import assessment, auth, kidney, tongue
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -37,3 +37,5 @@ async def health():
 # Include Routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(tongue.router, prefix="/api", tags=["Tongue Analysis"])
+app.include_router(kidney.router, prefix="/api", tags=["Kidney Analysis"])
+app.include_router(assessment.router, prefix="/api", tags=["Assessment"])

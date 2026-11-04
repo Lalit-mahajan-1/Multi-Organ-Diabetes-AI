@@ -10,10 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TongueRouteImport } from './routes/tongue'
-import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResultsRouteImport } from './routes/results'
 import { Route as ProcessingRouteImport } from './routes/processing'
-import { Route as LoginRouteImport } from './routes/login'
+import { Route as KidneyRouteImport } from './routes/kidney'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AssessmentRouteImport } from './routes/assessment'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,11 +21,6 @@ import { Route as OrgansOrganIdRouteImport } from './routes/organs.$organId'
 const TongueRoute = TongueRouteImport.update({
   id: '/tongue',
   path: '/tongue',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResultsRoute = ResultsRouteImport.update({
@@ -39,9 +33,9 @@ const ProcessingRoute = ProcessingRouteImport.update({
   path: '/processing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const KidneyRoute = KidneyRouteImport.update({
+  id: '/kidney',
+  path: '/kidney',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -69,10 +63,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/assessment': typeof AssessmentRoute
   '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
+  '/kidney': typeof KidneyRoute
   '/processing': typeof ProcessingRoute
   '/results': typeof ResultsRoute
-  '/signup': typeof SignupRoute
   '/tongue': typeof TongueRoute
   '/organs/$organId': typeof OrgansOrganIdRoute
 }
@@ -80,10 +73,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assessment': typeof AssessmentRoute
   '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
+  '/kidney': typeof KidneyRoute
   '/processing': typeof ProcessingRoute
   '/results': typeof ResultsRoute
-  '/signup': typeof SignupRoute
   '/tongue': typeof TongueRoute
   '/organs/$organId': typeof OrgansOrganIdRoute
 }
@@ -92,10 +84,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/assessment': typeof AssessmentRoute
   '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
+  '/kidney': typeof KidneyRoute
   '/processing': typeof ProcessingRoute
   '/results': typeof ResultsRoute
-  '/signup': typeof SignupRoute
   '/tongue': typeof TongueRoute
   '/organs/$organId': typeof OrgansOrganIdRoute
 }
@@ -105,10 +96,9 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment'
     | '/dashboard'
-    | '/login'
+    | '/kidney'
     | '/processing'
     | '/results'
-    | '/signup'
     | '/tongue'
     | '/organs/$organId'
   fileRoutesByTo: FileRoutesByTo
@@ -116,10 +106,9 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment'
     | '/dashboard'
-    | '/login'
+    | '/kidney'
     | '/processing'
     | '/results'
-    | '/signup'
     | '/tongue'
     | '/organs/$organId'
   id:
@@ -127,10 +116,9 @@ export interface FileRouteTypes {
     | '/'
     | '/assessment'
     | '/dashboard'
-    | '/login'
+    | '/kidney'
     | '/processing'
     | '/results'
-    | '/signup'
     | '/tongue'
     | '/organs/$organId'
   fileRoutesById: FileRoutesById
@@ -139,10 +127,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AssessmentRoute: typeof AssessmentRoute
   DashboardRoute: typeof DashboardRoute
-  LoginRoute: typeof LoginRoute
+  KidneyRoute: typeof KidneyRoute
   ProcessingRoute: typeof ProcessingRoute
   ResultsRoute: typeof ResultsRoute
-  SignupRoute: typeof SignupRoute
   TongueRoute: typeof TongueRoute
   OrgansOrganIdRoute: typeof OrgansOrganIdRoute
 }
@@ -154,13 +141,6 @@ declare module '@tanstack/react-router' {
       path: '/tongue'
       fullPath: '/tongue'
       preLoaderRoute: typeof TongueRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/results': {
@@ -177,11 +157,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcessingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/kidney': {
+      id: '/kidney'
+      path: '/kidney'
+      fullPath: '/kidney'
+      preLoaderRoute: typeof KidneyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -219,10 +199,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AssessmentRoute: AssessmentRoute,
   DashboardRoute: DashboardRoute,
-  LoginRoute: LoginRoute,
+  KidneyRoute: KidneyRoute,
   ProcessingRoute: ProcessingRoute,
   ResultsRoute: ResultsRoute,
-  SignupRoute: SignupRoute,
   TongueRoute: TongueRoute,
   OrgansOrganIdRoute: OrgansOrganIdRoute,
 }

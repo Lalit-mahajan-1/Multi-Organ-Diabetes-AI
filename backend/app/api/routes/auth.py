@@ -193,8 +193,8 @@ async def demo_login(response: Response):
 
     demo_user = {
         "id": "demo-user",
-        "email": "demo@clinic.health",
-        "name": "Dr. Avery Chen",
+        "email": "workspace@local",
+        "name": "Clinical workspace",
         "role": "clinician",
         "created_at": now,
     }

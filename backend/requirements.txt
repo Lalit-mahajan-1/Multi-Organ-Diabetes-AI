@@ -15,3 +15,6 @@ pydantic[email]
 numpy
 opencv-python
 tensorflow
+scikit-learn
+pandas
+joblib
